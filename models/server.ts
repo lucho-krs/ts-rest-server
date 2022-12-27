@@ -1,5 +1,8 @@
+import cors from 'cors';
 import express, { Application } from 'express';
 import userRoutes from '../routes/user';
+
+import db from '../db/connection';
 
 class Server {
 
@@ -14,8 +17,39 @@ class Server {
         this.app = express();
         this.port = process.env.PORT || '8000';
 
-        // Definir mis rutas
+        // Metodos iniciales
+        this.dbConnections();
+        this.middlewares();
         this.routes();
+
+    };
+
+    async dbConnections() {
+
+        try {
+            
+            await db.authenticate();
+            console.log('Database online :D');
+            
+
+        } catch ( error: any ) {
+            
+            throw new Error( error );
+
+        };
+
+    };
+
+    middlewares() {
+
+        // CORS
+        this.app.use( cors() );
+
+        // Lesctura body
+        this.app.use( express.json() );
+
+        // Carpeta publica
+        this.app.use( express.static( 'public' ) );
 
     };
 
